@@ -3,6 +3,7 @@ const http = require("http");
 const { json } = require("stream/consumers");
 const url = require("url");
 const nodemon = require("nodemon");
+const slugify = require("slugify");
 const createCards = require("./modules/replaceFunction");
 
 const overview = fs.readFileSync("./templates/overview.html", "utf-8");
@@ -13,6 +14,7 @@ let dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
   const urlcha = req.url;
+
   let query = +url.parse(urlcha, true).query.id;
   if (urlcha === "/overview" || urlcha === "/") {
     let changes = dataObj
@@ -27,6 +29,7 @@ const server = http.createServer((req, res) => {
     res.end(render);
   } else if (urlcha === `/product?id=${query}`) {
     let object = dataObj.find((val) => val.id === query);
+    res.url = slugify(object.productName);
     let productHTML = createCards(product, object);
 
     res.writeHead(200, { "content-type": "text/html" });
